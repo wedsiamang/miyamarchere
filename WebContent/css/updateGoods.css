@@ -1,0 +1,16 @@
+@charset "UTF-8";
+.wrapper-1{
+	width:90%;
+}
+.wrapper-2{
+	width:600px;
+	background-color:#fff5ee;
+	height:200px;
+ 	background-size: 400px;
+	padding: 15px;
+	
+}
+.preview{
+	font-weight:bold;
+	color:#ffffff;
+}

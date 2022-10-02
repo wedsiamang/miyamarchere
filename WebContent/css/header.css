@@ -1,0 +1,24 @@
+@charset "UTF-8";
+.visual {
+   display: flex;
+   justify-content: center;
+   text-align: center;
+   left: 70px;
+   margin: 40 20 20 20;
+ 	width: 90%;
+ 	height: 150px;
+   background: url(../head4.jpg) top center / cover no-repeat ;
+  padding: 40px;
+   position: absolute;
+}
+.headbox{
+	
+	 background-color: #04340a;
+	 top: 100px;
+	 width: 100%;
+	 height: 200px;
+	 color: #fff;
+	 vertical-align: center;
+	  
+}
+ 
