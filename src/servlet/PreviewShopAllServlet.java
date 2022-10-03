@@ -9,6 +9,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import dao.ShopDao;
 import model.Shop;
@@ -19,39 +20,24 @@ import model.Shop;
 @WebServlet("/PreviewShopAllServlet")
 public class PreviewShopAllServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public PreviewShopAllServlet() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		int shop_id=0;
-		
-		
-		ShopDao dao = new ShopDao();
-		 List<Shop>shopList=dao.shop_info();
-		
-		request.setAttribute("shopList", shopList);
-		
-		RequestDispatcher dispatcher=request.getRequestDispatcher("WEB-INF/jsp/previewShopAll.jsp");
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		// セッションスコープでログイン状態を保持
+		HttpSession session = request.getSession();
+		Shop login = (Shop) session.getAttribute("login");
+
+		try {
+			ShopDao dao = new ShopDao();
+			// 店舗一覧を取得
+			List<Shop> shopList = dao.shop_info();
+			request.setAttribute("shopList", shopList);
+		} catch (IllegalArgumentException e) {
+			System.out.println("nullは許容しません");
+			e.printStackTrace();
+		}
+		RequestDispatcher dispatcher = request.getRequestDispatcher("WEB-INF/jsp/previewShopAll.jsp");
 		dispatcher.forward(request, response);
-		
-		
-	}
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		doGet(request, response);
 	}
-
 }

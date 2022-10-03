@@ -1,6 +1,7 @@
 package servlet;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -13,146 +14,125 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 
 import dao.GoodsDao;
-import dao.ShopDao;
+import dao.LogDao;
 import model.Goods;
 import model.Shop;
+import pack.CheckParameter;
 
 /**
  * Servlet implementation class UpdateGoodsServlet
  */
-@WebServlet("/UpdatelimitGoodsServlet")
-@MultipartConfig(location="/tmp", maxFileSize=1048576)
-public class UpdatelimitGoodsServlet extends HttpServlet {
+@WebServlet("/UpdateLimitGoodsServlet")
+@MultipartConfig(location = "/tmp", maxFileSize = 1048576)
+public class UpdateLimitGoodsServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public UpdatelimitGoodsServlet() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
-		HttpSession session=request.getSession();
-		Shop login=(Shop)session.getAttribute("login");
-		String loginName=login.getShop_name();
-		
-		request.setCharacterEncoding("UTF-8");
-		int goods_id=0;
-	//	goods_id=Integer.parseInt(request.getParameter("goods_id"));
-		
-		
-		int shop_id=0;
-		String shop_name=loginName;
-		
-		GoodsDao dao=new GoodsDao();
-		Goods limitGoods=dao.limit_goods(loginName);
-		Goods limitGoodsPreview=dao.limit_goods_preview(loginName);
-		
-		Shop shop=new Shop();
-		ShopDao dao2=new ShopDao();
-		Shop selectShop=dao2.select_shop(loginName);
-		
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		// セッションスコープでログイン状態を保持
+		HttpSession session = request.getSession();
+		Shop login = (Shop) session.getAttribute("login");
+		String loginName = login.getShopName();
+
+		ArrayList<String> err = new ArrayList<String>();
+		request.setAttribute("err", err);
+
+		GoodsDao dao = new GoodsDao();
+		// 自分の店舗の商品の中で最大の商品IDの商品を選択
+		Goods limitGoods = dao.limit_goods(loginName);
+		// 自分の店舗の商品の中で最大の商品IDを選択しそのプレビュー表示を取得
+		Goods limitGoodsPreview = dao.limit_goods_preview(loginName);
+
 		request.setAttribute("limitGoods", limitGoods);
 		request.setAttribute("limitGoodsPreview", limitGoodsPreview);
-		request.setAttribute("selectShop",selectShop);
-		
-		RequestDispatcher dispatcher=request.getRequestDispatcher("WEB-INF/jsp/updatelimitGoods.jsp");
+
+		RequestDispatcher dispatcher = request.getRequestDispatcher("WEB-INF/jsp/updateLimitGoods.jsp");
 		dispatcher.forward(request, response);
 	}
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		HttpSession session=request.getSession();
-		Shop login=(Shop)session.getAttribute("login");
-		String loginName=login.getShop_name();
-		
-		request.setCharacterEncoding("UTF-8");
-		int goods_id=0;
-		int shop_id=0;
-		//shop_id=Integer.parseInt(request.getParameter("shop_id"));)
-		goods_id=Integer.parseInt(request.getParameter("goods_id"));
-		String shop_name=loginName;
-		String goods_name=request.getParameter("goods_name");
-		String kinds=request.getParameter("kinds");
-		int quantity=0;
-		int list_price=0;
-		int selling_price=0;
-		int discount_rate=0;
-		quantity=Integer.parseInt(request.getParameter("quantity"));
-		list_price=Integer.parseInt(request.getParameter("list_price"));
-		 selling_price=Integer.parseInt(request.getParameter("selling_price"));
-		String start_time=request.getParameter("start_time");
-		String end_time=request.getParameter("end_time");
-		String unit=request.getParameter("unit");
-		 String goods_img="";
-		String goods_comment=request.getParameter("goods_comment");
-			
-	//	SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-	//	simpleDateFormat.format(since_when);
-	//	simpleDateFormat.format(util_when);
-			
-		 
-		
-		// discount_rate=Integer.parseInt(request.getParameter("discount_rate"));
-		
-		//ファイルアップロード
-		Part part = request.getPart("img");
-		
-//		long timeStamp = new Date().getTime(); //時間取得
-//		
-//		String fileName = "";
-//		String dir = "";
-//		String name= "icon"+ timeStamp + goods_id + ".img";
-//		
-//		if (part!=null) {
-//			fileName = getFileName(part);
-//
-//			if(fileName!=null && fileName.length()!=0) {
-//				dir =  getServletContext().getRealPath("\\pic");
-//				goods_img = dir +"\\"+ name;
-//				part.write(goods_img);
-//				
-//			}
-//		}
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		HttpSession session = request.getSession();
+		Shop login = (Shop) session.getAttribute("login");
+		String loginName = login.getShopName();
+		try {
+			request.setCharacterEncoding("UTF-8");
+			int goodsId = 0;
+			goodsId = Integer.parseInt(request.getParameter("goodsId"));
+			String shopName = loginName;
+			String goodsName = request.getParameter("goodsName");
+			String kinds = request.getParameter("kinds");
+			String charaQuantity = request.getParameter("charaQuantity");
+			String charaListPrice = request.getParameter("charaListPrice");
+			String charaSellingPrice = request.getParameter("charaSellingPrice");
+			String startTime = request.getParameter("startTime");
+			String endTime = request.getParameter("endTime");
+			String unit = request.getParameter("unit");
 
-		
-		
-		
-		GoodsDao dao=new GoodsDao();
-		ShopDao dao2=new ShopDao();
-		
-		dao.update_goods(goods_id,kinds,goods_name,quantity,unit,list_price,selling_price,part,goods_comment,start_time,end_time);
-		
-		
-		Goods limitGoods=dao.limit_goods(loginName);
-		Goods limitGoodsPreview=dao.limit_goods_preview(loginName);
-		
-		request.setAttribute("limitGoods", limitGoods);
-		request.setAttribute("limitGoodsPreview", limitGoodsPreview);
-		
-		RequestDispatcher dispatcher=request.getRequestDispatcher("WEB-INF/jsp/updatelimitGoods.jsp");
-		dispatcher.forward(request, response);
-		
-			
-	
-//	private String getFileName(Part part) {
-//        String name = null;
-//        for (String dispotion : part.getHeader("Content-Disposition").split(";")) {
-//            if (dispotion.trim().startsWith("filename")) {
-//                name = dispotion.substring(dispotion.indexOf("=") + 1).replace("\"", "").trim();
-//                name = name.substring(name.lastIndexOf("\\") + 1);
-//                break;
-//            }
-//        }
-//        return name;
-//    }
+			String goodsComment = request.getParameter("goodsComment");
+
+			// パラメータチェック
+			CheckParameter c = new CheckParameter();
+			c.requiredCheck(shopName, "店舗名");
+			c.requiredCheck(kinds, "種類");
+			c.requiredCheck(goodsName, "商品名");
+			c.requiredCheck(goodsComment, "コメント");
+			c.requiredCheck(startTime, "販売開始時間");
+			c.requiredCheck(endTime, "販売終了時間");
+			c.requiredCheck(unit, "単位");
+			c.numCheck(charaQuantity, "個数");
+			c.numCheck(charaListPrice, "定価");
+			c.numCheck(charaSellingPrice, "出品価格");
+
+			GoodsDao dao = new GoodsDao();
+			LogDao lDao = new LogDao();
+			try {
+				// ファイルアップロード
+				Part part = request.getPart("img");
+				// エラーメッセージがあれば取得
+				if (c.hasErrors()) {
+					request.setAttribute("err", c.getError());
+					System.out.println(c.getError());
+
+					Goods limitGoods = dao.limit_goods(loginName);
+					Goods limitGoodsPreview = dao.limit_goods_preview(loginName);
+
+					request.setAttribute("limitGoods", limitGoods);
+					request.setAttribute("limitGoodsPreview", limitGoodsPreview);
+
+					RequestDispatcher dispatcher = request.getRequestDispatcher("WEB-INF/jsp/updateLimitGoods.jsp");
+					dispatcher.forward(request, response);
+				} else {
+					// 数値に変換
+					int quantity = Integer.parseInt(charaQuantity);
+					int listPrice = Integer.parseInt(charaListPrice);
+					int sellingPrice = Integer.parseInt(charaSellingPrice);
+					// 商品情報更新
+					dao.update_goods(kinds, goodsName, quantity, unit, listPrice, sellingPrice, part, startTime,
+							endTime, goodsComment, goodsId);
+
+					// ログを記録
+					lDao.insert_log(shopName, kinds, goodsName, quantity, unit, listPrice, sellingPrice, part,
+							startTime, endTime, goodsComment);
+
+					Goods limitGoods = dao.limit_goods(loginName);
+					Goods limitGoodsPreview = dao.limit_goods_preview(loginName);
+
+					request.setAttribute("limitGoods", limitGoods);
+					request.setAttribute("limitGoodsPreview", limitGoodsPreview);
+
+					ArrayList<String> err = new ArrayList<String>();
+					request.setAttribute("err", err);
+
+					RequestDispatcher dispatcher = request.getRequestDispatcher("WEB-INF/jsp/updateLimitGoods.jsp");
+					dispatcher.forward(request, response);
+				}
+			} catch (IllegalArgumentException e) {
+				System.out.println("nullは許容しません");
+				e.printStackTrace();
+			}
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+		}
 	}
 }

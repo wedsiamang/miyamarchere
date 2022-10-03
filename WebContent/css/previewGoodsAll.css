@@ -10,3 +10,6 @@
 	display: inline-block;
 	opacity: 0.5;
 }
+.red span:nth-child(1){
+	color: red;
+}

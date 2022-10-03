@@ -1,17 +1,17 @@
-package model;
+package pack;
 
 import java.io.FileNotFoundException;
 import java.time.LocalDateTime;
 
 import javax.servlet.http.Part;
 
-import dao.CronDao;
+import dao.EndGoodsDao;
 import it.sauronsoftware.cron4j.Scheduler;
 public class QuickStart {
 
 	//public static void main(String[] args)throws FileNotFoundException {
 	
-	public void Cron(int goods_id,String shop_name,String kinds,String goods_name,int quantity,int list_price,int selling_price,Part part,String goods_comment,int discount_rate,String start_time,String end_time,String unit) {
+	public void Cron(int goodsId,String shopName,String kinds,String goodsName,int quantity,int listPrice,int sellingPrice,Part part,String goodsComment,int discountRate,String startTime,String endTime,String unit) {
 	Scheduler s = new Scheduler();
 	
 	s.schedule("4-19,21-39,41-59 9-23 * * *", new Runnable() {
@@ -22,10 +22,10 @@ public class QuickStart {
 				
 			try {
 				System.out.println(l.now());
-				CronDao cdao=new CronDao();
+				EndGoodsDao dao=new EndGoodsDao();
 			
-				cdao.insert_endgoods(goods_id, shop_name, kinds, goods_name, quantity, list_price, selling_price, part, goods_comment, discount_rate, start_time, end_time, unit);
-				cdao.delete_goods();
+				dao.insert_endGoods(goodsId, shopName, kinds, goodsName, quantity, listPrice, sellingPrice, part, goodsComment, discountRate, startTime, endTime, unit);
+				dao.delete_goods();
 		//		dao.insertselect_goods(goods_id, shop_name, kinds, goods_name, quantity, list_price, selling_price, goods_img, goods_comment, discount_rate, start_time, end_time, unit);
 				
 				
@@ -45,7 +45,7 @@ public class QuickStart {
 		//s.stop();
 	}
 	
-	public void CronDelete(int goods_id,String shop_name,String kinds,String goods_name,int quantity,int list_price,int selling_price,Part part,String goods_comment,int discount_rate,String start_time,String end_time,String unit) {
+	public void CronDelete(int goodsId,String shopName,String kinds,String goodsName,int quantity,int listPrice,int sellingPrice,Part part,String goodsComment,int discountRate,String startTime,String endTime,String unit) {
 		Scheduler s = new Scheduler();
 		//9時から17時の毎時0分に起動
 		s.schedule("3,20,40 9-23 * * *", new Runnable() {
@@ -56,10 +56,10 @@ public class QuickStart {
 					
 				try {
 					System.out.println(l.now());
-					CronDao dao=new CronDao();
+					EndGoodsDao dao=new EndGoodsDao();
 					
-					dao.return_goods(goods_id, shop_name, kinds, goods_name, quantity, list_price, selling_price, part, goods_comment, discount_rate, start_time, end_time, unit);
-					dao.delete_endgoods();
+					dao.return_goods(goodsId, shopName, kinds, goodsName, quantity, listPrice, sellingPrice, part, goodsComment, discountRate, startTime, endTime, unit);
+					dao.delete_endGoods();
 					
 				}catch(FileNotFoundException e) {
 					e.printStackTrace();

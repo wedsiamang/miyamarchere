@@ -1,6 +1,7 @@
 package servlet;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -11,56 +12,89 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
-import dao.LoginDao;
-import dao.logDao;
-import model.Shop;
+import org.springframework.security.crypto.bcrypt.BCrypt;
+
+import dao.GoodsDao;
+import dao.LogDao;
+import dao.ShopDao;
+import pack.CheckParameter;
 
 /**
  * Servlet implementation class RegisterShopServlet
  */
 @WebServlet("/RegisterShopServlet")
-@MultipartConfig(location="/", maxFileSize=1048576)
+@MultipartConfig(location = "/tmp", maxFileSize = 1048576)
 public class RegisterShopServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		RequestDispatcher dispatcher=request.getRequestDispatcher("WEB-INF/jsp/registerShop.jsp");
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+
+		ArrayList<String> err = new ArrayList<String>();
+		request.setAttribute("err", err);
+
+		RequestDispatcher dispatcher = request.getRequestDispatcher("WEB-INF/jsp/registerShop.jsp");
 		dispatcher.forward(request, response);
 	}
 
-		protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+
 		request.setCharacterEncoding("UTF-8");
-		int shop_id=0;
-		String shop_name =request.getParameter("shop_name");
-		String password=request.getParameter("password");
-		String tel=request.getParameter("tel");
-		String address=request.getParameter("address");
-		String email=request.getParameter("email");
-		String business_hour=request.getParameter("business_hour");
-		String shop_img=request.getParameter("shop_img");
-		
-		String shop_comment=request.getParameter("shop_comment");
-		String nearBy=request.getParameter("nearBy");
-		String date_time=request.getParameter("date_time");	
-		
-		//ファイルアップロード
-				Part part = request.getPart("img");
-				
-				
-					Shop shop =new Shop();
-					LoginDao dao =new LoginDao();
-					dao.insert_new_shop(shop_id,shop_name,password,tel,address, email,business_hour,part,shop_comment,nearBy);
-		
-					dao.insert_goods_sample(shop_name);
-					
-					logDao ldao=new logDao();
-					ldao.insert_log_sample(shop_name);
-					
-					RequestDispatcher dispatcher=request.getRequestDispatcher("/WEB-INF/jsp/registerShop.jsp");
-					dispatcher.forward(request, response);
-	
-						
+
+		String shopName = request.getParameter("shopName");
+		String password = request.getParameter("password");
+		String tel = request.getParameter("tel");
+		String address = request.getParameter("address");
+		String email = request.getParameter("email");
+		String businessHour = request.getParameter("businessHour");
+		String shopComment = request.getParameter("shopComment");
+		String nearBy = request.getParameter("nearBy");
+
+		// パラメータチェック
+		CheckParameter c = new CheckParameter();
+		c.requiredCheck(shopName, "店舗名");
+		c.requiredCheck(password, "パスワード");
+		c.telNumberCheck(tel, "電話番号");
+		c.requiredCheck(address, "住所");
+		c.emailCheck(email, "email");
+		c.requiredCheck(businessHour, "営業時間");
+		c.requiredCheck(shopComment, "コメント");
+		c.requiredCheck(nearBy, "近くの建物からお店まで何分？");
+		try {
+			Part part = request.getPart("img");
+			// エラーメッセージがあれば取得
+			if (c.hasErrors()) {
+				request.setAttribute("err", c.getError());
+				System.out.println(c.getError());
+
+				RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/registerShop.jsp");
+				dispatcher.forward(request, response);
+
+			} else {
+
+				ShopDao dao = new ShopDao();
+				GoodsDao gDao = new GoodsDao();
+				// パスワードをハッシュ化
+				String hashedCode = BCrypt.hashpw(password, BCrypt.gensalt());
+				// 登録
+				dao.insert_new_shop(shopName, hashedCode, tel, address, email, businessHour, part, shopComment, nearBy);
+				// 商品サンプルを登録
+				gDao.insert_goods_sample(shopName);
+				// ログに記録
+				LogDao lDao = new LogDao();
+				lDao.insert_log_sample(shopName);
+
+				ArrayList<String> err = new ArrayList<String>();
+				request.setAttribute("err", err);
+
+				RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/registerShop.jsp");
+				dispatcher.forward(request, response);
+			}
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+			System.out.println("nullは許容しません");
+		}
 	}
 
 }

@@ -1,6 +1,7 @@
 package servlet;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -10,8 +11,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import dao.EndGoodsDao;
 import dao.GoodsDao;
-import dao.GoodsShopDao;
 import dao.ShopDao;
 import model.Goods;
 import model.GoodsShop;
@@ -23,89 +24,67 @@ import model.Shop;
 @WebServlet("/PreviewGoodsServlet")
 public class PreviewGoodsServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public PreviewGoodsServlet() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
-		HttpSession session=request.getSession();
-		Shop login=(Shop)session.getAttribute("login");
-		String loginName=login.getShop_name();
-		
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		request.setCharacterEncoding("UTF-8");
-		int goods_id=0;
-		goods_id=Integer.parseInt(request.getParameter("goods_id"));
-		String shop_name=loginName;
-		String goods_name=request.getParameter("goods_name");
-		int shop_id=0;
-		System.out.println(goods_id);
-		
-		
-		Goods goods=new Goods();
-		GoodsDao dao=new GoodsDao();
-		Goods selectGoods=dao.select_goods(goods_id,loginName);
-		
-		Shop shop=new Shop();
-		ShopDao dao2=new ShopDao();
-		Shop selectShop=dao2.select_shop(loginName);
-		
-		GoodsShopDao dao3=new GoodsShopDao();
-		GoodsShop gs=dao3.customerSelect_shop(goods_id);
-	
-		request.setAttribute("gs",gs);
-		request.setAttribute("selectGoods", selectGoods);
-		request.setAttribute("selectShop",selectShop);
-		
-		RequestDispatcher dispatcher=request.getRequestDispatcher("WEB-INF/jsp/previewGoods.jsp");
-		dispatcher.forward(request, response);
-		
-		
-		
-		
-	}
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	
-		HttpSession session=request.getSession();
-		Shop login=(Shop)session.getAttribute("login");
-		String loginName=login.getShop_name();
-		
-		request.setCharacterEncoding("UTF-8");
-		int goods_id=0;
-		goods_id=Integer.parseInt(request.getParameter("goods_id"));
-		System.out.println(goods_id);
-		
-		int shop_id=0;
-		String shop_name=loginName;
-		
-		
-		
-		GoodsDao dao=new GoodsDao();
-		Goods selectGoods=dao.select_goods(goods_id,loginName);
-		
-		Shop shop=new Shop();
-		ShopDao dao2=new ShopDao();
-		Shop selectShop=dao2.select_shop(loginName);
-		
-		
-		request.setAttribute("selectGoods", selectGoods);
-		request.setAttribute("selectShop",selectShop);
-		
-		RequestDispatcher dispatcher=request.getRequestDispatcher("WEB-INF/jsp/updateGoods.jsp");
+		try {
+			// セッションスコープでログイン状態を保持
+			HttpSession session = request.getSession();
+			Shop login = (Shop) session.getAttribute("login");
+			int goodsId = 0;
+			goodsId = Integer.parseInt(request.getParameter("goodsId"));
+			try {
+
+				GoodsDao dao = new GoodsDao();
+				// 選択された１つの商品情報を取得
+				Goods selectGoods = dao.select_goods(goodsId);
+				request.setAttribute("selectGoods", selectGoods);
+				// 選択された１つの商品情報から付随する店舗情報を取得
+				GoodsShop gs = dao.customerSelect_shop(goodsId);
+				request.setAttribute("gs", gs);
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+				System.out.println("nullは許容できません");
+			}
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+			System.out.println("数字以外が入力されました");
+		}
+		RequestDispatcher dispatcher = request.getRequestDispatcher("WEB-INF/jsp/previewGoods.jsp");
 		dispatcher.forward(request, response);
 	}
-		
 
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+
+		request.setCharacterEncoding("UTF-8");
+
+		HttpSession session = request.getSession();
+		Shop login = (Shop) session.getAttribute("login");
+		try {
+
+			String shopName = request.getParameter("shopName");
+
+			ShopDao dao = new ShopDao();
+			// 選択された店舗の店舗情報を取得
+			Shop introShop = dao.introduction_shop(shopName);
+			request.setAttribute("introShop", introShop);
+
+			GoodsDao gDao = new GoodsDao();
+			// 選択された店舗の商品一覧を取得
+			List<Goods> myGoodsList = gDao.myGoods_info(shopName);
+			request.setAttribute("myGoodsList", myGoodsList);
+
+			EndGoodsDao eDao = new EndGoodsDao();
+			// 選択された店舗の終了商品一覧を取得
+			List<Goods> myEndGoodsList = eDao.myEndGoods_info(shopName);
+			request.setAttribute("myEndGoodsList", myEndGoodsList);
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		}
+		RequestDispatcher dispatcher = request.getRequestDispatcher("WEB-INF/jsp/introductionShop.jsp");
+		dispatcher.forward(request, response);
+	}
 }

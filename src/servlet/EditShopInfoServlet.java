@@ -1,6 +1,7 @@
 package servlet;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -12,69 +13,105 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 
+import org.springframework.security.crypto.bcrypt.BCrypt;
+
 import dao.ShopDao;
 import model.Shop;
+import pack.CheckParameter;
 
 /**
  * Servlet implementation class EditShopInfoServlet
  */
 @WebServlet("/EditShopInfoServlet")
-@MultipartConfig(location="/", maxFileSize=1048576)
+@MultipartConfig(location = "/tmp", maxFileSize = 1048576)
 public class EditShopInfoServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
-  	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
-		HttpSession session=request.getSession();
-		Shop login=(Shop)session.getAttribute("login");
-		String loginName=login.getShop_name();
-		
-		
-		ShopDao dao =new ShopDao();
-		Shop select_shop=dao.select_shop(loginName);
-		request.setAttribute("select_shop",select_shop);
-		
-		RequestDispatcher dispatcher=request.getRequestDispatcher("/WEB-INF/jsp/editShopInfo.jsp");
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+
+		HttpSession session = request.getSession();
+		Shop login = (Shop) session.getAttribute("login");
+		String loginName = login.getShopName();
+
+		ShopDao dao = new ShopDao();
+		Shop selectShop = dao.select_shop(loginName);
+		request.setAttribute("selectShop", selectShop);
+
+		ArrayList<String> err = new ArrayList<String>();
+		request.setAttribute("err", err);
+
+		RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/editShopInfo.jsp");
 		dispatcher.forward(request, response);
 	}
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
-		HttpSession session=request.getSession();
-		Shop login=(Shop)session.getAttribute("login");
-		String loginName=login.getShop_name();
-		
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		// セッションスコープでログイン状態を保持
+		HttpSession session = request.getSession();
+		Shop login = (Shop) session.getAttribute("login");
+		String loginName = login.getShopName();
+
 		request.setCharacterEncoding("UTF-8");
-			int shop_id=0;
-			String shop_name =loginName;
-			String password=request.getParameter("password");
-			String tel=request.getParameter("tel");
-			String address=request.getParameter("address");
-			String email=request.getParameter("email");
-			String business_hour=request.getParameter("business_hour");
-			String shop_img=request.getParameter("shop_img");
-			String map=request.getParameter("map");
-			String shop_comment=request.getParameter("shop_comment");
-			String nearBy=request.getParameter("nearBy");
-			String date_time=request.getParameter("date_time");	
-			
-			//ファイルアップロード
+
+		String shopName = loginName;
+		String password = request.getParameter("password");
+		String tel = request.getParameter("tel");
+		String address = request.getParameter("address");
+		String email = request.getParameter("email");
+		String businessHour = request.getParameter("businessHour");
+		String shopComment = request.getParameter("shopComment");
+		String nearBy = request.getParameter("nearBy");
+		String hashedCode = password;
+
+		// パラメータチェック
+		CheckParameter c = new CheckParameter();
+		c.requiredCheck(shopName, "店舗名");
+		c.requiredCheck(password, "パスワード");
+		c.telNumberCheck(tel, "電話番号");
+		c.requiredCheck(address, "住所");
+		c.emailCheck(email, "email");
+		c.requiredCheck(businessHour, "営業時間");
+		c.requiredCheck(shopComment, "店舗コメント");
+		c.requiredCheck(nearBy, "近くの建物からお店まで何分？");
+
+		ShopDao dao = new ShopDao();
+		try {
+			// ファイルアップロード
 			Part part = request.getPart("img");
-			
-			
-				
-					Shop shop =new Shop();
-					ShopDao dao =new ShopDao();
-					dao.update_shop(loginName,shop_name,password,tel,address, email,business_hour,part,shop_comment,nearBy);
-					Shop select_shop=dao.select_shop(loginName);
-					request.setAttribute("select_shop",select_shop);
-					
-				RequestDispatcher dispatcher=request.getRequestDispatcher("/WEB-INF/jsp/editShopInfo.jsp");
+			// エラーメッセージ取得
+			if (c.hasErrors()) {
+				request.setAttribute("err", c.getError());
+				System.out.println(c.getError());
+				// 自分の店舗情報を取得
+				Shop selectShop = dao.select_shop(loginName);
+				request.setAttribute("selectShop", selectShop);
+
+				RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/editShopInfo.jsp");
 				dispatcher.forward(request, response);
-			
-		}	
-			
+
+			} else {
+
+				// もしパスワードを変更していたらハッシュ化
+				if (password.matches("[!-~]{1,10}")) {
+					hashedCode = BCrypt.hashpw(password, BCrypt.gensalt());
+					System.out.println(hashedCode);
+				}
+				// 店舗情報更新
+				dao.update_shop(hashedCode, tel, address, email, businessHour, part, shopComment, nearBy, loginName);
+				Shop selectShop = dao.select_shop(loginName);
+				request.setAttribute("selectShop", selectShop);
+
+				ArrayList<String> err = new ArrayList<String>();
+				request.setAttribute("err", err);
+
+				RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/editShopInfo.jsp");
+				dispatcher.forward(request, response);
+			}
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+			System.out.println("nullは許容しません");
+		}
+	}
+
 }

@@ -11,74 +11,62 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import dao.CronDao;
+import dao.EndGoodsDao;
 import dao.GoodsDao;
-import dao.GoodsShopDao;
-import dao.ShopDao;
 import model.Goods;
-import model.GoodsShop;
 import model.Shop;
 
-/**
- * Servlet implementation class PreviewGoodsAllServlet
- */
 @WebServlet("/PreviewGoodsAllServlet")
+//@MultipartConfig(location="/", maxFileSize=1048576)
 public class PreviewGoodsAllServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
-   	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
-		HttpSession session=request.getSession();
-		Shop login=(Shop)session.getAttribute("login");
-		String loginName=login.getShop_name();
-		
-		int goods_id=0;
-		String shop_name=loginName;
-		
-		GoodsDao dao = new GoodsDao();
-		 List<Goods>goodsList=dao.goods_info();
-		request.setAttribute("goodsList", goodsList);
-		
-		CronDao cdao=new CronDao();
-		List<Goods>endgoodsList=cdao.endgoods_info();
-		request.setAttribute("endgoodsList", endgoodsList);		
-		
-		
-		RequestDispatcher dispatcher=request.getRequestDispatcher("WEB-INF/jsp/previewGoodsAll.jsp");
-		dispatcher.forward(request, response);
-	}
 
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
-		HttpSession session=request.getSession();
-		Shop login=(Shop)session.getAttribute("login");
-		String loginName=login.getShop_name();
-		
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		// セッションスコープでログイン状態を保持
+		HttpSession session = request.getSession();
+		Shop login = (Shop) session.getAttribute("login");
+
 		request.setCharacterEncoding("UTF-8");
-		int goods_id=0;
-		goods_id=Integer.parseInt(request.getParameter("goods_id"));
-		System.out.println(goods_id);
-		
-		int shop_id=0;
-		String shop_name=loginName;
-		
-		GoodsShopDao dao3=new GoodsShopDao();
-		GoodsShop gs=dao3.customerSelect_shop(goods_id);
-		request.setAttribute("gs",gs);
-		
-		GoodsDao dao=new GoodsDao();
-		Goods selectGoods=dao.select_goods(goods_id);
-		
-		Shop shop=new Shop();
-		ShopDao dao2=new ShopDao();
-		Shop selectShop=dao2.select_shop(loginName);
-		
-		
-		request.setAttribute("selectGoods", selectGoods);
-		request.setAttribute("selectShop",selectShop);
-		
-		RequestDispatcher dispatcher=request.getRequestDispatcher("WEB-INF/jsp/previewGoods.jsp");
-		dispatcher.forward(request, response);	
+		// ソート分岐パラメーター
+		String neo = request.getParameter("neo");
+		String shop = request.getParameter("shop");
+		String half = request.getParameter("half");
+
+		GoodsDao dao = new GoodsDao();
+		EndGoodsDao eDao = new EndGoodsDao();
+
+		// 新着順
+		if (neo != null) {
+			// 商品一覧を取得
+			List<Goods> goodsList = dao.goods_info();
+			request.setAttribute("goodsList", goodsList);
+			// 終了商品一覧を取得
+			List<Goods> endGoodsList = eDao.endGoods_info();
+			request.setAttribute("endGoodsList", endGoodsList);
+			//
+			request.setAttribute(neo, "neo");
+			// 店舗別
+		} else if (shop != null) {
+			// 商品一覧w店舗別に取得
+			List<Goods> sortShop = dao.goods_info_byShop();
+			request.setAttribute("sortShop", sortShop);
+			request.setAttribute(shop, "shop");
+
+			// 半額以下
+		} else if (half != null) {
+			// 商品一覧を半額以下のみ取得
+			List<Goods> sortHalf = dao.goods_info_half();
+			request.setAttribute("sortHalf", sortHalf);
+			request.setAttribute(half, "half");
+		}
+		RequestDispatcher dispatcher = request.getRequestDispatcher("WEB-INF/jsp/previewGoodsAll.jsp");
+		dispatcher.forward(request, response);
+
 	}
 
 }
