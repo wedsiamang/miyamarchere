@@ -199,10 +199,14 @@ public class EndGoodsDao {
 			String endTime, String unit) throws FileNotFoundException {
 		// Connection conn = null;
 		// PreparedStatement st = null;
-
+          //デモ　最大のgoods_idを１つ終了テーブルにコピーする
 		String sql = "INSERT INTO endgoods(goods_id,shop_name,kinds,goods_name,quantity,unit,list_price,selling_price,goods_img,goods_comment"
 				+ ",start_time,end_time)select distinct goods_id,shop_name,kinds,goods_name,quantity,unit,list_price,selling_price,goods_img,"
 				+ "goods_comment,start_time,end_time from goods  where goods_id in(select min(goods_id)from goods) ";
+		
+	//本番 販売終了時間が過ぎた商品を終了テーブルにコピーする
+	//	String sql = "INSERT INTO endgoods(goods_id,shop_name,kinds,goods_name,quantity,unit,list_price,selling_price,goods_img,goods_comment,start_time,end_time)select goods_id,shop_name,kinds,goods_name,quantity,unit,list_price,selling_price,goods_img,goods_comment,start_time,end_time from goods where end_time < clock_timestamp() ";				
+	
 		try {
 			Class.forName("org.postgresql.Driver");
 		} catch (Exception e) {
@@ -211,7 +215,6 @@ public class EndGoodsDao {
 		try (Connection conn = DriverManager.getConnection(rb.getString("jdbc_url"), rb.getString("db_user"),
 				rb.getString("db_pass")); PreparedStatement st = conn.prepareStatement(sql);) {
 			// conn.setAutoCommit(false);
-//本番		String sql = "INSERT INTO endgoods(goods_id,shop_name,kinds,goods_name,quantity,unit,list_price,selling_price,goods_img,goods_comment,start_time,end_time)select goods_id,shop_name,kinds,goods_name,quantity,unit,list_price,selling_price,goods_img,goods_comment,start_time,end_time from goods where end_time < now() ";				
 			// 最小のgoods_idを１つ選択する
 			// String sql="INSERT INTO
 			// endgoods(goods_id,shop_name,kinds,goods_name,quantity,unit,list_price,selling_price,goods_img,goods_comment,start_time,end_time)select
@@ -237,7 +240,7 @@ public class EndGoodsDao {
 		// PreparedStatement st = null;
 		int rs = 0;
 
-		// 本番 String sql="DELETE FROM goods WHERE end_time <now() ";
+		// 本番 String sql="DELETE FROM goods WHERE end_time < clock_timestamp()  ";
 		String sql = "DELETE FROM goods where goods_id in(select min(goods_id)from goods) ";
 		// "DELETE FROM goods where goods_id in(select goods_id from goods asc limit
 		// 2)";
