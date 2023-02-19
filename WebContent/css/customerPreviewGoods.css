@@ -1,0 +1,27 @@
+@charset "UTF-8";
+/*btn outline*/
+.btnkinds-outline{
+	outline: none;
+	border: none;
+	background: transparent;
+}
+.btnkinds  {
+    background: #eee8aa;
+    border-radius: 50px;
+    position: relative;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin: 0 auto;
+    max-width: 100px;
+    padding: 10px 25px;
+    color: #fff;
+    transition: 0.3s ease-in-out;
+    font-weight: 500;
+ 
+}
+@media screen and (max-width:480px){
+	main{
+	width: 100%;
+	}
+}

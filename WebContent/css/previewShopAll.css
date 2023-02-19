@@ -1,0 +1,10 @@
+@charset "UTF-8";
+.card{
+	padding: 20px 20px 20px 20px;
+}
+
+/*btn outline*/
+.btn-outline{
+	outline: none;
+	border: none;
+}

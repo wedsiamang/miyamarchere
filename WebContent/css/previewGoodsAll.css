@@ -1,0 +1,15 @@
+@charset "UTF-8";
+
+/*btn outline*/
+.btn-outline{
+	outline: none;
+	border: none;
+}
+.dark{
+	background-color: black;
+	display: inline-block;
+	opacity: 0.5;
+}
+.red span:nth-child(1){
+	color: red;
+}

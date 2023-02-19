@@ -1,0 +1,27 @@
+@charset "UTF-8";
+
+/* card*/ 
+.card{
+	margin: 20px 20px 20px 20px;
+	
+	
+}
+.card-body{
+	line-height: 10px;
+	height: 160px;
+	
+}
+.card-img-top{
+	height: 160px;
+}
+/*btn outline*/
+.btn-outline{
+	outline: none;
+	border: none;
+}
+.span{
+	color: red;
+}
+
+	
+	
