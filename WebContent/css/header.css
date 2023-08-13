@@ -1,0 +1,43 @@
+<!--
+.visual {
+   display: flex;
+   justify-content: center;
+   text-align: center;
+  
+   margin: 0px 0px 60px 0px; /* 左右のマージンを0に設定 */
+   width: 100%;
+   height: 150px;
+   background: url(../head4.jpg) top center / cover no-repeat ;
+   padding: 0px; /* 左右のパディングを0に設定 */
+   position: absolute;
+} -->
+.visual {
+   display: flex;
+   justify-content: center;
+   text-align: center;
+   
+  margin: 0 auto;
+ 	width: 100%;
+ 	height: 100px;
+   background: url(../halfhead2.jpg) top center / cover no-repeat ;
+  padding: 40px;
+   color: #fff;
+   
+   
+}
+
+
+@media screen and (max-width: 480px) {
+.visual {
+   display: flex;
+   justify-content: center;
+   text-align: center;
+   
+  margin: 0 auto;
+ 	width: 100%;
+ 	height: 100px;
+   background: url(../halfhead2.jpg) top center / cover no-repeat ;
+  padding: 40px;
+   color: #fff;
+}
+}
