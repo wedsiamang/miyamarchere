@@ -1,0 +1,21 @@
+@charset "UTF-8";
+.all{
+	position: relative;
+	padding-bottom: 60px;
+	box-sizing: border-box;
+	min-height: 100vh;
+	margin-bottom: 60px;
+}
+main{
+	height: auto;
+	margin-bottom: 60px;
+}
+.card{
+	padding: 20px 20px 20px 20px;
+}
+
+/*btn outline*/
+.btn-outline{
+	outline: none;
+	border: none;
+}

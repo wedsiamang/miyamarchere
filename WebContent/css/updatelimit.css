@@ -1,0 +1,36 @@
+@charset "UTF-8";
+/*btn outline*/
+.all{
+	position: relative;
+	padding-bottom: 60px;
+	box-sizing: border-box;
+	min-height: 100vh;
+	margin-bottom: 60px;
+}
+main{
+	height: auto;
+	margin-bottom: 60px;
+}
+.btnkinds-outline{
+	outline: none;
+	border: none;
+	background: transparent;
+}
+.btnkinds  {
+    background: #eee8aa;
+    border-radius: 50px;
+    position: relative;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin: 0 auto;
+    max-width: 100px;
+    padding: 10px 25px;
+    color: #fff;
+    transition: 0.3s ease-in-out;
+    font-weight: 500;
+ 
+}
+.red span:nth-child(1){
+	color: red;
+}

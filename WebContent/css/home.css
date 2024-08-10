@@ -1,0 +1,105 @@
+@charset "UTF-8";
+/*btn outline*/
+.all{
+	position: relative;
+	padding-bottom: 60px;
+	box-sizing: border-box;
+	min-height: 100vh;
+	margin-bottom: 60px;
+}
+.btn-outline{
+	outline: none;
+	border: none;
+}
+.dark{
+	background-color: black;
+	display: inline-block;
+	opacity: 0.5;
+}
+
+html{
+	height: 100%;
+}
+body{
+	min-height: 100%;
+}
+main{
+	height: auto;
+	margin-bottom: 60px;
+}
+
+
+.card-responsive {
+    width: 100%;
+}
+.container{
+	height: auto;
+}
+/* ウェブ版のスタイル */
+    #gmap {
+        width: 400px;
+        height: 400px;
+    }
+    
+   
+
+@media (min-width: 768px) {
+    .card-responsive {
+        width: 720px;
+    }
+     .col-md-3 {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px; /* カード間のスペースを追加 */
+    }
+           #gmap {
+            width: 100%;
+            height: auto; /* ここも調整することができます。例えば、特定の高さを指定したい場合はその値に変更してください */
+        }
+    }
+
+
+@media (min-width: 992px) {
+    .card-responsive {
+        width: 960px;
+    }
+     .col-md-3 {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px; /* カード間のスペースを追加 */
+    }
+      #gmap {
+            width: 100%;
+            height: auto; /* ここも調整することができます。例えば、特定の高さを指定したい場合はその値に変更してください */
+        }
+}
+
+@media (min-width: 1200px) {
+    .card-responsive {
+        width: 1200px;
+    }
+     .col-md-3 {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px; /* カード間のスペースを追加 */
+    }
+      #gmap {
+            width: 100%;
+            height: auto; /* ここも調整することができます。例えば、特定の高さを指定したい場合はその値に変更してください */
+        }
+
+@media (max-width:480px){
+	.card-responsive{
+	width: 100%;
+	}
+	 .col-md-3 {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px; /* カード間のスペースを追加 */
+    }
+	  #gmap {
+            width: 100%;
+            height: auto; /* ここも調整することができます。例えば、特定の高さを指定したい場合はその値に変更してください */
+        }
+}
+}

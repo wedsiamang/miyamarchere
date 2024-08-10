@@ -1,0 +1,37 @@
+@charset "UTF-8";
+
+.all{
+	position: relative;
+	padding-bottom: 60px;
+	box-sizing: border-box;
+	min-height: 100vh;
+	margin-bottom: 60px;
+}
+
+/*btn outline*/
+.btn-outline{
+	outline: none;
+	border: none;
+}
+.dark{
+	background-color: black;
+	display: inline-block;
+	opacity: 0.5;
+}
+.span{
+	color: red;
+}
+.main {
+   margin-top: 100px; /* あなたが望むピクセル数に設定します。 */
+}
+
+@media screen and (max-width: 480px) {
+	
+	.main {
+    margin-top: 50px; /* 例: モバイル画面でのマージンを調整 */
+  }
+  .card {
+    margin-bottom: 20px; /* 例: モバイル画面でのカード間のマージンを調整 */
+  }
+}
+	
